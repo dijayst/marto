@@ -4,7 +4,9 @@ import Horixontalrule from "@/component/Content/horixontalrule";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { BsEmojiSmile, } from "react-icons/bs";
-import { FaTrophy } from "react-icons/fa";
+import { FaRocketchat, FaTrophy } from "react-icons/fa";
+import ChatraWidget from "@/component/Chatra/Chatrawidget";
+import Script from "next/script";
 
 export default function Home() {
   const router = useRouter();
@@ -12,6 +14,24 @@ export default function Home() {
    <div className="bg-white">
     
 
+     <Script
+      id="chatra-script"
+      strategy="afterInteractive"
+      dangerouslySetInnerHTML={{
+        __html: `
+          (function(d, w, c) {
+              w.ChatraID = '3mrDbWYMFC3Yxm7av';
+              var s = d.createElement('script');
+              w[c] = w[c] || function() {
+                  (w[c].q = w[c].q || []).push(arguments);
+              };
+              s.async = true;
+               s.src = 'https://call.chatra.io/chatra.js';
+              if (d.head) d.head.appendChild(s);
+          })(document, window, 'Chatra');
+        `,
+      }}
+    />
   <section className="flex flex-col items-center justify-center w-full  mx-auto  bg-white md:py-20 py-6 px-6  ">
   <p className="text-[#000] text-[23px]  md:text-[50px] text-center">Our Specialities</p>
   

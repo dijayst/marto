@@ -13,6 +13,8 @@ import "slick-carousel/slick/slick-theme.css";
 import { useRef } from "react";
 import Footer from "@/component/Footer/Footer";
 import { exo2 } from "./fonts";
+import ChatraWidget from "@/component/Chatra/Chatrawidget";
+import { FaRocketchat } from "react-icons/fa";
 
 type FirstSectionProps = {
   isAboutPage?: boolean;
@@ -151,6 +153,7 @@ export default function RootLayout({ children, isAboutPage }: FirstSectionProps)
 
 
      {children}
+     
      <Footer/>
     
       </body>

@@ -1,4 +1,4 @@
-/*import { serialize } from "cookie";
+import { serialize } from "cookie";
 import { NextApiRequest, NextApiResponse } from "next";
 import bcrypt from "bcryptjs";
 import { connectDB } from "@/lib/mongodb";
@@ -43,7 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
          } catch (error) {
     console.error("Signup error:", error);
-    return res.status(500).json({ message: "Internal Server Error" });
+   // return res.status(500).json({ message: "Internal Server Error" });
   }
   }
 
@@ -55,80 +55,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   return res.status(405).json({ error: "Method not allowed" });
-}
-*/
-
-
-import { serialize } from "cookie";
-import { NextApiRequest, NextApiResponse } from "next";
-import bcrypt from "bcryptjs";
-import { connectDB } from "@/lib/mongodb";
-import User from "@/models/User";
-import { v4 as uuidv4 } from "uuid";
-
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    await connectDB();
-
-    if (req.method === "POST") {
-      // Make sure req.body is parsed
-      const { email, password } = req.body || {};
-
-      if (!email || !password) {
-        return res.status(400).json({ message: "Email and password are required" });
-      }
-
-      const existingUser = await User.findOne({ email });
-      if (existingUser) {
-        return res.status(400).json({ message: "User already exists" });
-      }
-
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const role = email === "admin@site.com" ? "admin" : "user";
-      const trackingId = "TRK-" + uuidv4().slice(0, 8).toUpperCase();
-
-      const newUser = await User.create({
-        email,
-        password: hashedPassword,
-        role,
-        trackingId,
-      });
-
-      // Set cookie
-      const cookie = serialize(
-        "userSession",
-        JSON.stringify({ email: newUser.email, role: newUser.role }),
-        {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-          maxAge: 60 * 60 * 24,
-          path: "/",
-        }
-      );
-      res.setHeader("Set-Cookie", cookie);
-
-      // ✅ Proper JSON response
-      return res.status(201).json({
-        message: "Signup successful",
-        user: {
-          email: newUser.email,
-          role: newUser.role,
-          trackingId: newUser.trackingId,
-          createdAt: newUser.createdAt,
-        },
-      });
-    }
-
-    // If method not POST
-    return res.status(405).json({ message: "Method not allowed" });
-  } catch (error: any) {
-    console.error("Signup error:", error);
-
-    // Always respond with JSON, even on errors
-    return res.status(500).json({
-      message: "Internal Server Error",
-      error: error.message || "Something went wrong",
-    });
-  }
 }

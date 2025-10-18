@@ -39,7 +39,7 @@ export default function Signin() {
       alert("Admin login successful ✅");
       return;
     }
-let result;
+
     try {
       const endpoint = isLogin ? "/api/auth/login" : "/api/auth/signup";
       const res = await fetch(endpoint, {
@@ -48,9 +48,7 @@ let result;
         body: JSON.stringify({ email, password }),
       });
 
-      //const result = await res.json();
-       result = await res.json();
-      
+      const result = await res.json();
       // if (!res.ok) throw new Error(result.error || "User already exists");
 
       if (!res.ok) {

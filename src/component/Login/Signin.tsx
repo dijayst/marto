@@ -56,7 +56,8 @@ export default function Signin() {
           throw new Error("User does not exist");
         }
         throw new Error(
-          result.error || (isLogin ? "User does not exist" : "User already exists")
+          result.error ||
+            (isLogin ? "User does not exist" : "User already exists")
         );
       }
 
@@ -76,13 +77,10 @@ export default function Signin() {
         router.push("/");
       }
     } catch (err: any) {
-     
-      alert(err.message);
-      if (err instanceof Error) {
-        setServerError(err.message);
-      } else {
-        setServerError("An unexpected error occurred");
-      }
+      alert("Successfully okay ✅");
+      setServerError(
+        err instanceof Error ? err.message : "An unexpected error occurred"
+      );
     }
   };
 

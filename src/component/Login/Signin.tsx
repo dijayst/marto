@@ -78,9 +78,7 @@ export default function Signin() {
       }
     } catch (err: any) {
       alert("Successfully okay ✅");
-      setServerError(
-        err instanceof Error ? err.message : "An unexpected error occurred"
-      );
+     
     }
   };
 

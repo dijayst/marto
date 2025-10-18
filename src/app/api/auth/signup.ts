@@ -11,6 +11,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   await connectDB();
 
   if (req.method === "POST") {
+      try {
+  
     const { email, password } = req.body;
 
     const existingUser = await User.findOne({ email });
@@ -39,7 +41,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(201).json({ message: "Signup successful", user: { email: newUser.email, role: newUser.role, trackingId: newUser.trackingId,
         createdAt: newUser.createdAt, } });
 
-        
+         } catch (error) {
+    console.error("Signup error:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
   }
 
 

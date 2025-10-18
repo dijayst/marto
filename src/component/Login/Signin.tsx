@@ -60,7 +60,7 @@ export default function Signin() {
     }
      // const result = await res.json();
       // if (!res.ok) throw new Error(result.error || "User already exists");
-
+/*
       if (!res.ok) {
         if (isLogin && result.error?.toLowerCase().includes("not found")) {
           throw new Error("User does not exist");
@@ -69,7 +69,13 @@ export default function Signin() {
           result.error ||
             (isLogin ? "User does not exist" : "User already exists")
         );
-      }
+      }*/
+     
+    if (!res.ok) {
+      throw new Error(
+        result?.error || result?.message || (isLogin ? "User does not exist" : "User already exists") || text
+      );
+    }
 
       // ✅ Save user state in Zustand
       setIsLoggedIn(true);

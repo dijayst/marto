@@ -1,0 +1,6 @@
+.Container {
+  background-image: url("../../../public//images/header_bg.png");
+  background-position: top;
+  background-repeat: no-repeat;
+  background-size: contain;
+}

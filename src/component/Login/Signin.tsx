@@ -22,7 +22,7 @@ export default function Signin() {
   const [isLogin, setIsLogin] = useState(true);
   const login = useAuthStore((state) => state.login);
   const [showPassword, setShowPassword] = useState(false);
-  //const [serverError, setServerError] = useState<string | null>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const {
     register,
@@ -88,7 +88,7 @@ export default function Signin() {
     }
   };
 
-  const onSubmit = async (data: LoginFormInputs | SignupFormInputs) => {
+  const onSubmitp= async (data: LoginFormInputs | SignupFormInputs) => {
     setServerError(null);
 
 
@@ -122,11 +122,20 @@ export default function Signin() {
 
       const result = await res.json();
 
-      if (!res.ok) {
+     /* if (!res.ok) {
         setServerError(result.message || "Something went wrong");
         return;
       }
+*/
 
+ if (!res.ok) {
+        if (isLogin && result.error?.toLowerCase().includes("not found")) {
+          throw new Error("User does not exist");
+        }
+        throw new Error(
+          result.error || (isLogin ? "User does not exist" : "User already exists")
+        );
+      }
 
 
        setIsLoggedIn(true);
@@ -144,15 +153,46 @@ export default function Signin() {
         router.push("/");
       }
       console.log("Success:", result);
-      // You can redirect or update UI here
+      
     } catch (error: any) {
       setServerError(error.message || "Something went wrong");
     }
   };
 
 
-  const [serverError, setServerError] = useState<string | null>(null);
 
+const onSubmit = async (data: LoginFormInputs | SignupFormInputs) => {
+    setServerError(null);
+
+    // If signup, check confirm password
+    if (!isLogin && "confirmPassword" in data && data.password !== data.confirmPassword) {
+      setServerError("Passwords do not match");
+      return;
+    }
+
+    const endpoint = isLogin ? "/api/auth/login" : "/api/auth/signup";
+
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: data.email, password: data.password }),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        setServerError(result.message || "Something went wrong");
+        return;
+      }
+
+      console.log("Success:", result);
+      // You can redirect or update UI here
+    } catch (error: any) {
+      setServerError(error.message || "Something went wrong");
+    }
+  };
+  
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#445370] ">
       <div className="bg-white p-6 rounded-lg shadow-lg w-96">

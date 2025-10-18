@@ -29,7 +29,7 @@ export default function Signin() {
     formState: { errors },
   } = useForm<LoginFormInputs | SignupFormInputs>();
 
-  const onSubmit = async (data: any) => {
+  const onSubmitcoreee = async (data: any) => {
     const { email, password } = data;
     const { setIsLoggedIn, setCurrentUser } = useAuthStoree.getState();
 
@@ -48,34 +48,17 @@ export default function Signin() {
         body: JSON.stringify({ email, password }),
       });
 
-
-
-       const text = await res.text();
-
-    let result;
-    try {
-      result = JSON.parse(text); // try to parse JSON
-    } catch {
-      result = null; // fallback if not JSON
-    }
-     // const result = await res.json();
+      const result = await res.json();
       // if (!res.ok) throw new Error(result.error || "User already exists");
-/*
+
       if (!res.ok) {
         if (isLogin && result.error?.toLowerCase().includes("not found")) {
           throw new Error("User does not exist");
         }
         throw new Error(
-          result.error ||
-            (isLogin ? "User does not exist" : "User already exists")
+          result.error || (isLogin ? "User does not exist" : "User already exists")
         );
-      }*/
-     
-    if (!res.ok) {
-      throw new Error(
-        result?.error || result?.message || (isLogin ? "User does not exist" : "User already exists") || text
-      );
-    }
+      }
 
       // ✅ Save user state in Zustand
       setIsLoggedIn(true);
@@ -92,64 +75,49 @@ export default function Signin() {
       } else {
         router.push("/");
       }
-    }  catch (err: any) {
+    } catch (err: any) {
+      //catch (err: any) {      alert(err.message);      setServerError(err.message);}
+
       alert(err.message);
-      setServerError(err.message);
+      if (err instanceof Error) {
+        setServerError(err.message);
+      } else {
+        setServerError("An unexpected error occurred");
+      }
     }
   };
 
-  const onSubmit7 = async (data: any) => {
-  const { email, password } = data;
-  const { setIsLoggedIn, setCurrentUser } = useAuthStoree.getState();
+  const onSubmit = async (data: LoginFormInputs | SignupFormInputs) => {
+    setServerError(null);
 
-  if (email === "admin@site.com" && password === "Admin$123") {
-    login("admin");
-    router.push("/admin");
-    alert("Admin login successful ✅");
-    return;
-  }
+    if (!isLogin && "confirmPassword" in data && data.password !== data.confirmPassword) {
+      setServerError("Passwords do not match");
+      return;
+    }
 
-  try {
     const endpoint = isLogin ? "/api/auth/login" : "/api/auth/signup";
-    const res = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
 
-    // read response as text first
-    const text = await res.text();
-
-    let result;
     try {
-      result = JSON.parse(text); // try to parse JSON
-    } catch {
-      result = null; // fallback if not JSON
-    }
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: data.email, password: data.password }),
+      });
 
-    if (!res.ok) {
-      throw new Error(
-        result?.error || result?.message || (isLogin ? "User does not exist" : "User already exists") || text
-      );
-    }
+      const result = await res.json();
 
-    setIsLoggedIn(true);
-    setCurrentUser({ email: result.user.email, role: "user" });
-    localStorage.setItem("userEmail", result.user.email);
-    alert(result?.message || "Login successful ✅");
+      if (!res.ok) {
+        setServerError(result.message || "Something went wrong");
+        return;
+      }
 
-    const redirectPath = localStorage.getItem("redirectAfterLogin");
-    if (redirectPath) {
-      localStorage.removeItem("redirectAfterLogin");
-      router.push(redirectPath);
-    } else {
-      router.push("/");
+      console.log("Success:", result);
+      // You can redirect or update UI here
+    } catch (error: any) {
+      setServerError(error.message || "Something went wrong");
     }
-  } catch (err: any) {
-    alert(err.message);
-    setServerError(err instanceof Error ? err.message : "An unexpected error occurred");
-  }
-};
+  };
+
 
   const [serverError, setServerError] = useState<string | null>(null);
 

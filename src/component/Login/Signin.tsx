@@ -89,6 +89,9 @@ export default function Signin() {
     }
   };
 
+
+
+  
   const onSubmit = async (data: any) => {
     const { email, password } = data;
     const { setIsLoggedIn, setCurrentUser } = useAuthStoree.getState();
@@ -100,30 +103,27 @@ export default function Signin() {
       return;
     }
 
-    const apiurl = process.env.API_URL || "http://localhost:3000";
+    
     try {
       const endpoint = isLogin ? "/api/auth/login" : "/api/auth/signup";
-      // const res = await fetch(endpoint, {
-      const res = await fetch(`${apiurl}${endpoint}`, {
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
       const result = await res.json();
-      // if (!res.ok) throw new Error(result.error || "User already exists");
-
+      
       if (!res.ok) {
         if (isLogin && result.error?.toLowerCase().includes("not found")) {
           throw new Error("User does not exist");
         }
         throw new Error(
-          result.error ||
-            (isLogin ? "User does not exist" : "User already exists")
+          result.error || (isLogin ? "User does not exist" : "User already exists")
         );
       }
 
-      // ✅ Save user state in Zustand
+      
       setIsLoggedIn(true);
       setCurrentUser({ email: result.user.email, role: "user" });
 
@@ -149,6 +149,7 @@ export default function Signin() {
       }
     }
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#445370] ">

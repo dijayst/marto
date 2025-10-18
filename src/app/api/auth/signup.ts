@@ -57,6 +57,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   return res.status(405).json({ error: "Method not allowed" });
 }
 */
+
+
 import { serialize } from "cookie";
 import { NextApiRequest, NextApiResponse } from "next";
 import bcrypt from "bcryptjs";
@@ -69,6 +71,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await connectDB();
 
     if (req.method === "POST") {
+      // Make sure req.body is parsed
       const { email, password } = req.body || {};
 
       if (!email || !password) {
@@ -91,6 +94,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         trackingId,
       });
 
+      // Set cookie
       const cookie = serialize(
         "userSession",
         JSON.stringify({ email: newUser.email, role: newUser.role }),
@@ -102,9 +106,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           path: "/",
         }
       );
-
       res.setHeader("Set-Cookie", cookie);
 
+      // ✅ Proper JSON response
       return res.status(201).json({
         message: "Signup successful",
         user: {
@@ -116,17 +120,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
-    if (req.method === "GET") {
-      return res
-        .status(200)
-        .json({ message: "Signup endpoint is working. Please send a POST request." });
-    }
-
-    return res.status(405).json({ error: "Method not allowed" });
+    // If method not POST
+    return res.status(405).json({ message: "Method not allowed" });
   } catch (error: any) {
     console.error("Signup error:", error);
-    return res.status(500).json({ message: "Internal Server Error", error: error.message });
+
+    // Always respond with JSON, even on errors
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message || "Something went wrong",
+    });
   }
 }
-
-

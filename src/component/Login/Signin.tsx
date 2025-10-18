@@ -30,7 +30,7 @@ export default function Signin() {
     formState: { errors },
   } = useForm<LoginFormInputs | SignupFormInputs>();
 
-  const onSubmitcoreee = async (data: any) => {
+  const onSubmit = async (data: any) => {
     const { email, password } = data;
     const { setIsLoggedIn, setCurrentUser } = useAuthStoree.getState();
 
@@ -40,10 +40,10 @@ export default function Signin() {
       alert("Admin login successful ✅");
       return;
     }
-
+    const apiurl = process.env.API_URL;
     try {
       const endpoint = isLogin ? "/api/auth/login" : "/api/auth/signup";
-      const res = await fetch(endpoint, {
+      const res = await fetch(`${apiurl}/endpoint`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -57,7 +57,8 @@ export default function Signin() {
           throw new Error("User does not exist");
         }
         throw new Error(
-          result.error || (isLogin ? "User does not exist" : "User already exists")
+          result.error ||
+            (isLogin ? "User does not exist" : "User already exists")
         );
       }
 
@@ -88,111 +89,6 @@ export default function Signin() {
     }
   };
 
-  const onSubmitp= async (data: LoginFormInputs | SignupFormInputs) => {
-    setServerError(null);
-
-
-
-    const { email, password } = data;
-    const { setIsLoggedIn, setCurrentUser } = useAuthStoree.getState();
-
-    if (email === "admin@site.com" && password === "Admin$123") {
-      login("admin");
-      router.push("/admin");
-      alert("Admin login successful ✅");
-      return;
-    }
-
-
-
-
-    if (!isLogin && "confirmPassword" in data && data.password !== data.confirmPassword) {
-      setServerError("Passwords do not match");
-      return;
-    }
-
-    const endpoint = isLogin ? "/api/auth/login" : "/api/auth/signup";
-
-    try {
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: data.email, password: data.password }),
-      });
-
-      const result = await res.json();
-
-     /* if (!res.ok) {
-        setServerError(result.message || "Something went wrong");
-        return;
-      }
-*/
-
- if (!res.ok) {
-        if (isLogin && result.error?.toLowerCase().includes("not found")) {
-          throw new Error("User does not exist");
-        }
-        throw new Error(
-          result.error || (isLogin ? "User does not exist" : "User already exists")
-        );
-      }
-
-
-       setIsLoggedIn(true);
-      setCurrentUser({ email: result.user.email, role: "user" });
-
-      localStorage.setItem("userEmail", result.user.email);
-      alert(result.message);
-
-      // ✅ Redirect back to Get Quotes if needed
-      const redirectPath = localStorage.getItem("redirectAfterLogin");
-      if (redirectPath) {
-        localStorage.removeItem("redirectAfterLogin");
-        router.push(redirectPath);
-      } else {
-        router.push("/");
-      }
-      console.log("Success:", result);
-      
-    } catch (error: any) {
-      setServerError(error.message || "Something went wrong");
-    }
-  };
-
-
-
-const onSubmit = async (data: LoginFormInputs | SignupFormInputs) => {
-    setServerError(null);
-
-    // If signup, check confirm password
-    if (!isLogin && "confirmPassword" in data && data.password !== data.confirmPassword) {
-      setServerError("Passwords do not match");
-      return;
-    }
-
-    const endpoint = isLogin ? "/api/auth/login" : "/api/auth/signup";
-
-    try {
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: data.email, password: data.password }),
-      });
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        setServerError(result.message || "Something went wrong");
-        return;
-      }
-
-      console.log("Success:", result);
-      // You can redirect or update UI here
-    } catch (error: any) {
-      setServerError(error.message || "Something went wrong");
-    }
-  };
-  
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#445370] ">
       <div className="bg-white p-6 rounded-lg shadow-lg w-96">

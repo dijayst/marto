@@ -81,7 +81,8 @@ export default function Signin() {
      
     }
   };
-const onSubmit = async (data: any) => {
+
+  const onSubmit = async (data: any) => {
   const { email, password } = data;
   const { setIsLoggedIn, setCurrentUser } = useAuthStoree.getState();
 
@@ -100,24 +101,26 @@ const onSubmit = async (data: any) => {
       body: JSON.stringify({ email, password }),
     });
 
+    // read response as text first
+    const text = await res.text();
+
     let result;
     try {
-      result = await res.json(); // attempt to parse JSON
-    } catch (err) {
-      // fallback for non-JSON responses
-      throw new Error(`Server returned non-JSON response: ${await res.text()}`);
+      result = JSON.parse(text); // try to parse JSON
+    } catch {
+      result = null; // fallback if not JSON
     }
 
     if (!res.ok) {
       throw new Error(
-        result?.error || result?.message || (isLogin ? "User does not exist" : "User already exists")
+        result?.error || result?.message || (isLogin ? "User does not exist" : "User already exists") || text
       );
     }
 
     setIsLoggedIn(true);
     setCurrentUser({ email: result.user.email, role: "user" });
     localStorage.setItem("userEmail", result.user.email);
-    alert(result.message);
+    alert(result?.message || "Login successful ✅");
 
     const redirectPath = localStorage.getItem("redirectAfterLogin");
     if (redirectPath) {

@@ -29,7 +29,7 @@ export default function Signin() {
     formState: { errors },
   } = useForm<LoginFormInputs | SignupFormInputs>();
 
-  const onSubmit9 = async (data: any) => {
+  const onSubmit = async (data: any) => {
     const { email, password } = data;
     const { setIsLoggedIn, setCurrentUser } = useAuthStoree.getState();
 
@@ -48,7 +48,17 @@ export default function Signin() {
         body: JSON.stringify({ email, password }),
       });
 
-      const result = await res.json();
+
+
+       const text = await res.text();
+
+    let result;
+    try {
+      result = JSON.parse(text); // try to parse JSON
+    } catch {
+      result = null; // fallback if not JSON
+    }
+     // const result = await res.json();
       // if (!res.ok) throw new Error(result.error || "User already exists");
 
       if (!res.ok) {
@@ -76,13 +86,13 @@ export default function Signin() {
       } else {
         router.push("/");
       }
-    } catch (err: any) {
-      alert("Successfully okay ✅");
-     
+    }  catch (err: any) {
+      alert(err.message);
+      setServerError(err.message);
     }
   };
 
-  const onSubmit = async (data: any) => {
+  const onSubmit7 = async (data: any) => {
   const { email, password } = data;
   const { setIsLoggedIn, setCurrentUser } = useAuthStoree.getState();
 

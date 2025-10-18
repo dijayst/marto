@@ -103,10 +103,13 @@ export default function Signin() {
       return;
     }
 
-    
+    const apiurl = process.env.API_URL || "http://localhost:3000";
+
     try {
       const endpoint = isLogin ? "/api/auth/login" : "/api/auth/signup";
-      const res = await fetch(endpoint, {
+     // const res = await fetch(endpoint, {
+      const res = await fetch(`${apiurl}${endpoint}`, {
+ 
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

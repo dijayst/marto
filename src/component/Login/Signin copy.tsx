@@ -49,53 +49,6 @@ export default function Signin() {
         body: JSON.stringify({ email, password }),
       });
 
-      let result: any;
-
-      // 🧩 Check if response is JSON before parsing
-      const text = await res.text();
-      try {
-        result = JSON.parse(text);
-      } catch {
-        throw new Error(`Server Error: ${text}`);
-      }
-
-      if (!res.ok) {
-        if (isLogin && result.error?.toLowerCase().includes("not found")) {
-          throw new Error("User does not exist");
-        }
-        throw new Error(
-          result.error ||
-            (isLogin ? "User does not exist" : "User already exists")
-        );
-      }
-
-      setIsLoggedIn(true);
-      setCurrentUser({ email: result.user.email, role: "user" });
-      localStorage.setItem("userEmail", result.user.email);
-      alert(result.message);
-
-      const redirectPath = localStorage.getItem("redirectAfterLogin");
-      if (redirectPath) {
-        localStorage.removeItem("redirectAfterLogin");
-        router.push(redirectPath);
-      } else {
-        router.push("/");
-      }
-    } catch (err: any) {
-      alert(err.message);
-      if (err instanceof Error) setServerError(err.message);
-      else setServerError("An unexpected error occurred");
-    }
-
-    /*
-    try {
-      const endpoint = isLogin ? "/api/auth/login" : "/api/auth/signup";
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
       //const result = await res.json();
       const text = await res.text();
       let result;
@@ -140,7 +93,7 @@ export default function Signin() {
       } else {
         setServerError("An unexpected error occurred");
       }
-    }*/
+    }
   };
 
   return (

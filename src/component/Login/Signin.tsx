@@ -81,11 +81,7 @@ export default function Signin() {
       } else {
         router.push("/");
       }
-    } catch (err: any) {
-      alert(err.message);
-      if (err instanceof Error) setServerError(err.message);
-      else setServerError("An unexpected error occurred");
-    }
+    } catch (err: any) {}
 
     /*
     try {

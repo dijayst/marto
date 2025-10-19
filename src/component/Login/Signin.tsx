@@ -30,7 +30,7 @@ export default function Signin() {
     formState: { errors },
   } = useForm<LoginFormInputs | SignupFormInputs>();
 
-  const onSubmit8 = async (data: any) => {
+  const onSubmit = async (data: any) => {
     const { email, password } = data;
     const { setIsLoggedIn, setCurrentUser } = useAuthStoree.getState();
 
@@ -141,60 +141,6 @@ export default function Signin() {
         setServerError("An unexpected error occurred");
       }
     }*/
-  };
-
-  const onSubmit = async (data: any) => {
-    const { email, password } = data;
-    const { setIsLoggedIn, setCurrentUser } = useAuthStoree.getState();
-
-    if (email === "admin@site.com" && password === "Admin$123") {
-      login("admin");
-      router.push("/admin");
-      alert("Admin login successful ✅");
-      return;
-    }
-
-    try {
-      const endpoint = isLogin ? "/api/auth/login" : "/api/auth/signup";
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      // ✅ Always try to parse JSON safely
-      let result;
-      try {
-        result = await res.json();
-      } catch (parseErr) {
-        throw new Error("Server did not return valid JSON");
-      }
-
-      if (!res.ok) {
-        throw new Error(result.message || "Something went wrong");
-      }
-
-      // ✅ Only access result.user if it exists
-      if (!result.user) throw new Error("No user returned");
-
-      setIsLoggedIn(true);
-      setCurrentUser({ email: result.user.email, role: result.user.role });
-
-      localStorage.setItem("userEmail", result.user.email);
-      alert(result.message);
-
-      const redirectPath = localStorage.getItem("redirectAfterLogin");
-      if (redirectPath) {
-        localStorage.removeItem("redirectAfterLogin");
-        router.push(redirectPath);
-      } else {
-        router.push("/");
-      }
-    } catch (err: any) {
-      alert(err.message || "An unexpected error occurred");
-      if (err instanceof Error) setServerError(err.message);
-      else setServerError("An unexpected error occurred");
-    }
   };
 
   return (

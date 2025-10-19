@@ -143,7 +143,7 @@ export default function Signin() {
     }*/
   };
 
-  const onSubmitTRY = async (data: any) => {
+  const onSubmit = async (data: any) => {
     const { email, password } = data;
     const { setIsLoggedIn, setCurrentUser } = useAuthStoree.getState();
 
@@ -194,36 +194,6 @@ export default function Signin() {
       alert(err.message || "An unexpected error occurred");
       if (err instanceof Error) setServerError(err.message);
       else setServerError("An unexpected error occurred");
-    }
-  };
-
-  const onSubmit = async (data: any) => {
-    const { email, password } = data;
-    const { setIsLoggedIn, setCurrentUser } = useAuthStoree.getState();
-
-    try {
-      const res = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      let result: any;
-      try {
-        result = await res.json();
-      } catch {
-        throw new Error("Server did not return valid JSON");
-      }
-
-      if (!res.ok) throw new Error(result.message || "Signup failed");
-
-      // ✅ Success
-      setIsLoggedIn(true);
-      setCurrentUser({ email: result.user.email, role: result.user.role });
-      localStorage.setItem("userEmail", result.user.email);
-      alert(result.message);
-    } catch (err: any) {
-      alert(err.message || "Unexpected error occurred");
     }
   };
 

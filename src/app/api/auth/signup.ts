@@ -1,4 +1,4 @@
-/*import { serialize } from "cookie";
+import { serialize } from "cookie";
 import { NextApiRequest, NextApiResponse } from "next";
 import bcrypt from "bcryptjs";
 import { connectDB } from "@/lib/mongodb";
@@ -55,7 +55,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   return res.status(405).json({ error: "Method not allowed" });
-}*/
+}
+  
+
+/*
 // pages/api/auth/signup.ts
 import { NextApiRequest, NextApiResponse } from "next";
 //import connectDB from "@/utils/connectDB";
@@ -120,6 +123,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } catch (err: any) {
     console.error("Signup error:", err);
     // Always return JSON
-    return res.status(500).json({ message: "Signup successfull" });
+    return res.status(500).json({ message: "Internal server error" });
   }
 }
+*/

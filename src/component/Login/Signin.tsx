@@ -30,7 +30,7 @@ export default function Signin() {
     formState: { errors },
   } = useForm<LoginFormInputs | SignupFormInputs>();
 
-  const onSubmit = async (data: any) => {
+  const onSubmity = async (data: any) => {
     const { email, password } = data;
     const { setIsLoggedIn, setCurrentUser } = useAuthStoree.getState();
 
@@ -143,6 +143,64 @@ export default function Signin() {
     }*/
   };
 
+  const onSubmit = async (data: any) => {
+    const { email, password } = data;
+    const { setIsLoggedIn, setCurrentUser } = useAuthStoree.getState();
+
+    if (email === "admin@site.com" && password === "Admin$123") {
+      login("admin");
+      router.push("/admin");
+      alert("Admin login successful ✅");
+      return;
+    }
+
+    try {
+      const endpoint = isLogin ? "/api/auth/login" : "/api/auth/signup";
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const result = await res.json();
+      // if (!res.ok) throw new Error(result.error || "User already exists");
+
+      if (!res.ok) {
+        if (isLogin && result.error?.toLowerCase().includes("not found")) {
+          throw new Error("User does not exist");
+        }
+        throw new Error(
+          result.error ||
+            (isLogin ? "User does not exist" : "User already exists")
+        );
+      }
+
+      // ✅ Save user state in Zustand
+      setIsLoggedIn(true);
+      setCurrentUser({ email: result.user.email, role: "user" });
+
+      localStorage.setItem("userEmail", result.user.email);
+      alert(result.message);
+
+      // ✅ Redirect back to Get Quotes if needed
+      const redirectPath = localStorage.getItem("redirectAfterLogin");
+      if (redirectPath) {
+        localStorage.removeItem("redirectAfterLogin");
+        router.push(redirectPath);
+      } else {
+        router.push("/");
+      }
+    } catch (err: any) {
+      //catch (err: any) {      alert(err.message);      setServerError(err.message);}
+
+      alert(err.message);
+      if (err instanceof Error) {
+        setServerError(err.message);
+      } else {
+        setServerError("An unexpected error occurred");
+      }
+    }
+  };
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#445370] ">
       <div className="bg-white p-6 rounded-lg shadow-lg w-96">
